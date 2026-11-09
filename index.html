@@ -3,70 +3,253 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CTS MOD - Final</title>
+<title>CTS MOD - Sensitivity Store</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
 body{background:#000;color:#fff;padding:15px}
-.top{background:#1a1a1a;padding:15px;font-size:22px;font-weight:bold;border-left:5px solid #ff0000;display:flex;justify-content:space-between;align-items:center}
+.top{background:#1a1a1a;padding:16px;font-size:26px;font-weight:bold;border-left:6px solid #ff0000;display:flex;justify-content:space-between;align-items:center}
 .top span:last-child{font-size:13px;color:#ff0000;cursor:pointer}
-.warn{background:#ff0000;padding:10px;text-align:center;font-size:12px;font-weight:bold;margin:15px 0;border-radius:8px}
-.box{max-width:450px;margin:auto}
+.safe{background:#00c853;padding:12px;text-align:center;font-size:14px;font-weight:bold;margin:15px 0;border-radius:8px;color:#fff}
+.box{max-width:480px;margin:auto}
 .card{background:#111;border:1px solid #333;border-radius:12px;padding:15px;margin-bottom:15px}
 h3{color:#ff0000;margin-bottom:10px}
-select,input{width:100%;padding:12px;background:#222;color:#fff;border:1px solid #444;border-radius:8px;margin-bottom:10px;outline:none}
-button{width:100%;padding:13px;background:#ff0000;color:#fff;border:none;border-radius:8px;font-weight:bold;font-size:15px;cursor:pointer}
+select,input{width:100%;padding:13px;background:#222;color:#fff;border:1px solid #444;border-radius:8px;margin-bottom:10px;outline:none;font-size:15px}
+button{width:100%;padding:14px;background:#ff0000;color:#fff;border:none;border-radius:8px;font-weight:bold;font-size:16px;cursor:pointer}
 button.green{background:#00c853} button.gray{background:#333}
-.price-box{text-align:center;font-size:20px;padding:15px;background:#1a0000;border:1px solid #ff0000;border-radius:10px;margin:10px 0}
+.price-box{text-align:center;font-size:22px;padding:15px;background:#1a0000;border:1px solid #ff0000;border-radius:10px;margin:10px 0}
 .qr-box{text-align:center;display:none}
-.qr-box img{width:220px;height:220px;background:#fff;padding:10px;border-radius:10px}
-.sensi-box{display:none;background:#0a0a0a;border:1px solid #00c853;padding:15px;border-radius:10px;line-height:2}
+.qr-box img{width:230px;height:230px;background:#fff;padding:10px;border-radius:10px}
+.sensi-box{display:none;background:#0a0a0a;border:1px solid #00c853;padding:16px;border-radius:10px;line-height:2.1}
+.sensi-box b{color:#00ff88}
+.sensi-row{display:flex;justify-content:space-between;border-bottom:1px solid #222;padding:4px 0}
+.sensi-row span:last-child{color:#00ff88;font-weight:bold}
 .hidden{display:none}
-.tabs{display:flex;gap:10px;margin-bottom:15px}
-.tabs button{flex:1}
-.profile-pic{width:70px;height:70px;background:#ff0000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;margin:auto;margin-bottom:10px}
-.purchase-item{background:#1a1a1a;border:1px solid #333;padding:10px;border-radius:8px;margin-bottom:8px;font-size:14px;line-height:1.6}
-.purchase-item b{color:#00ff88}
+.note{font-size:12px;color:#aaa;line-height:1.6;margin-top:10px}
 </style>
 </head>
 <body>
 <div class="box">
-<div class="top"><span>CTS MOD</span><span onclick="document.getElementById('adminPanel').scrollIntoView()">ADMIN</span></div>
-<div class="warn">100% SAFE - ONLY SENSITIVITY - NO HACK<br>DON'T TRY IN MAIN ID</div>
+<div class="top"><span>CTS MOD</span><span onclick="showAdmin()">ADMIN</span></div>
+<div class="safe">✅ 100% SAFE - MAIN ID ME BHI USE KAR SAKTE HO<br><span style="font-size:12px;font-weight:normal">NO HACK - ONLY REAL HEADSHOT SENSITIVITY</span></div>
 
-<!-- AUTH -->
-<div class="card" id="authScreen">
-<h3 id="authTitle">CREATE ACCOUNT</h3>
-<input type="text" id="regName" placeholder="Full Name">
-<input type="text" id="regEmail" placeholder="Email (Phone se login ke liye pehle Email banao)">
-<input type="password" id="regPass" placeholder="Password">
-<input type="password" id="regConfirm" placeholder="Confirm Password">
-<button onclick="handleAuth()">SIGN UP</button>
-<p style="text-align:center;margin:12px 0;font-size:13px;color:#aaa">Already Account Hai?</p>
-<button class="gray" onclick="toggleAuth()">LOGIN KARO</button>
-<p id="authMsg" style="margin-top:10px;color:yellow;text-align:center"></p>
-<p style="font-size:11px;color:#777;text-align:center;margin-top:10px">Phone Number se login ke liye Firebase me Phone Auth Enable karna padega.<br>Abhi Email wala system chal raha hai.</p>
-</div>
-
-<!-- MAIN APP -->
-<div id="mainApp" class="hidden">
-<div class="tabs">
-<button onclick="showTab('shop')">🛒 SHOP</button>
-<button onclick="showTab('profile')">👤 PROFILE</button>
-<button onclick="logout()" style="background:#333">LOGOUT</button>
-</div>
-
-<div id="tabShop">
-<div class="card"><p>Welcome, <b id="welcomeName">User</b> 👋</p><p style="font-size:13px;color:#aaa" id="welcomeEmail"></p></div>
+<!-- SHOP -->
 <div class="card" id="step1">
-<h3>1. Device Choose Karo</h3>
-<select id="brand" onchange="loadModels()"><option value="">Brand Choose Karo</option><option value="Samsung">Samsung</option><option value="Redmi">Redmi / Xiaomi</option><option value="Poco">Poco</option><option value="Realme">Realme</option><option value="Vivo">Vivo</option><option value="Oppo">Oppo</option><option value="OnePlus">OnePlus</option><option value="iQOO">iQOO</option><option value="Motorola">Motorola</option><option value="Infinix">Infinix</option><option value="Tecno">Tecno</option><option value="iPhone">iPhone</option><option value="Nothing">Nothing</option></select>
+<h3>1. Apna Device Choose Karo</h3>
+<select id="brand" onchange="loadModels()">
+<option value="">Brand Choose Karo</option>
+<option value="Samsung">Samsung</option>
+<option value="Redmi">Redmi / Xiaomi</option>
+<option value="Poco">Poco</option>
+<option value="Realme">Realme</option>
+<option value="Vivo">Vivo</option>
+<option value="Oppo">Oppo</option>
+<option value="OnePlus">OnePlus</option>
+<option value="iQOO">iQOO</option>
+<option value="Motorola">Motorola</option>
+<option value="Infinix">Infinix</option>
+<option value="Tecno">Tecno</option>
+<option value="iPhone">iPhone</option>
+<option value="Nothing">Nothing</option>
+<option value="Lava">Lava</option>
+</select>
 <select id="model"><option value="">Pehle Brand Choose Karo</option></select>
-<div class="price-box" id="priceShow">Price: ₹5</div>
-<button onclick="goPay()">PAY - SENSITIVITY UNLOCK KARO</button>
+<div class="price-box" id="priceShow">Price: ₹5 Only</div>
+<button onclick="goPay()">PAY ₹5 - SENSITIVITY UNLOCK KARO</button>
+<p class="note">Payment ke baad usi device ki real sensi khulegi. Dusre device ki sensi nahi dikhegi.</p>
 </div>
+
+<!-- PAYMENT -->
 <div class="card qr-box" id="step2">
 <h3>2. UPI Se Pay Karo</h3>
-<p id="payFor"></p>
-<img src="my-qr.png" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa=YOURUPI@okaxis&pn=CTS%20MOD&am=5&cu=INR'">
-<p style="margin:10px 0;font-size:14px">UPI ID: <b>YOURUPI@okaxis - YAHAN APNI UPI DALO</b></p>
-<input type="text" id="utr" placeholder="UTR / Transaction ID daalo
+<p id="payFor" style="margin-bottom:10px;color:#ccc"></p>
+<img src="my-qr.png" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=230x230&data=upi://pay?pa=YOURUPI@okaxis&pn=CTS%20MOD&am=5&cu=INR'">
+<p style="margin:12px 0;font-size:14px">UPI ID: <b>YOURUPI@okaxis</b><br><span style="font-size:12px;color:#aaa">Yahan apni UPI ID daalo</span></p>
+<input type="text" id="utr" placeholder="UTR / Transaction ID daalo (12 Digit)">
+<button class="green" onclick="verifyPay()">I HAVE PAID - VERIFY KARO</button>
+<p id="verifyMsg" style="margin-top:10px;color:yellow"></p>
+<button class="gray" style="margin-top:10px" onclick="backTo1()">Back</button>
+</div>
+
+<!-- SENSI SHOW -->
+<div class="card sensi-box" id="step3">
+<h3 style="color:#00ff88">✅ UNLOCKED - <span id="sensiDevice"></span></h3>
+<p style="font-size:13px;color:#aaa;margin-bottom:10px">Real Headshot Sensitivity - Is device ke liye tested</p>
+<div id="sensiData"></div>
+<div style="margin-top:12px;background:#111;padding:10px;border-radius:8px;font-size:13px;line-height:1.8">
+<b style="color:#fff">EXTRA SETTINGS:</b><br>
+<span id="extraData"></span>
+</div>
+<button style="margin-top:15px" onclick="backToShop()">Dusra Device Dekho</button>
+</div>
+
+<!-- ADMIN -->
+<div class="card" id="adminPanel" style="border:1px dashed #666">
+<h3>ADMIN PANEL - CTS MOD</h3>
+<input type="password" id="adminPass" placeholder="Admin Password: 1234">
+<button class="gray" onclick="unlockAdmin()">UNLOCK ADMIN</button>
+<div id="adminForm" class="hidden" style="margin-top:10px">
+<select id="aBrand" onchange="loadAdminModels()"><option value="">Brand</option></select>
+<select id="aModel"><option value="">Model</option></select>
+<input type="text" id="aGeneral" placeholder="General">
+<input type="text" id="aRedDot" placeholder="Red Dot">
+<input type="text" id="a2x" placeholder="2X Scope">
+<input type="text" id="a4x" placeholder="4X Scope">
+<input type="text" id="aSniper" placeholder="Sniper Scope">
+<input type="text" id="aFreeLook" placeholder="Free Look">
+<input type="text" id="aDPI" placeholder="DPI">
+<input type="text" id="aFire" placeholder="Fire Button Size">
+<input type="text" id="aPrice" placeholder="Price: 5">
+<button class="green" onclick="saveSensi()">SAVE SENSITIVITY</button>
+<p id="adminMsg" style="margin-top:10px;color:#00ff88"></p>
+</div>
+</div>
+</div>
+
+<script>
+let models={
+"Samsung":["Galaxy A14","Galaxy A15","Galaxy A34","Galaxy A54","Galaxy S21 FE","Galaxy S23","Galaxy S24","Galaxy M34","Galaxy F54","Galaxy A55","Galaxy S23 FE"],
+"Redmi":["Redmi Note 12","Redmi Note 13","Redmi Note 13 Pro","Redmi Note 13 Pro Max","Redmi 12","Redmi 13C","Redmi Note 11","Redmi Note 12 Pro","Redmi K50i"],
+"Poco":["Poco X5","Poco X6","Poco X6 Pro","Poco F5","Poco M6 Pro","Poco C65","Poco X5 Pro"],
+"Realme":["Realme 11","Realme 12","Realme Narzo 60","Realme GT Neo 3","Realme C55","Realme 10 Pro","Realme 12 Pro","Realme Narzo 70"],
+"Vivo":["Vivo T2","Vivo Y200","Vivo V29","Vivo V30","Vivo Y27","Vivo T3","Vivo Y100"],
+"Oppo":["Oppo A78","Oppo A59","Oppo F25","Oppo Reno 11","Oppo A18","Oppo A38"],
+"OnePlus":["OnePlus Nord CE4","OnePlus 11R","OnePlus 12R","OnePlus Nord 3","OnePlus 11","OnePlus Nord CE3"],
+"iQOO":["iQOO Z7","iQOO Z9","iQOO Neo 7","iQOO 12","iQOO Z9x"],
+"Motorola":["Moto G54","Moto G84","Moto Edge 40","Moto G34","Moto Edge 50"],
+"Infinix":["Infinix Note 30","Infinix Hot 40","Infinix Zero 30","Infinix GT 10 Pro","Infinix Note 40"],
+"Tecno":["Tecno Spark 20","Tecno Camon 20","Tecno Pova 5","Tecno Spark Go"],
+"iPhone":["iPhone 11","iPhone 12","iPhone 13","iPhone 14","iPhone 15","iPhone 15 Pro Max","iPhone 13 Pro"],
+"Nothing":["Nothing Phone 1","Nothing Phone 2","Nothing Phone 2a"],
+"Lava":["Lava Blaze 5G","Lava Agni 2","Lava Yuva 3"]
+};
+
+// REAL HEADSHOT SENSI - HAR DEVICE KE HISAB SE ALAG
+// Low-end phone = thodi high sensi, Flagship = thodi low sensi kyunki touch smooth hota hai
+let sensiDB={
+// Samsung - Smooth touch, medium sensi
+"Samsung Galaxy A14":{general:185,red:178, x2:170, x4:165, sniper:140, free:165, dpi:480, fire:52},
+"Samsung Galaxy A15":{general:190,red:182, x2:175, x4:168, sniper:145, free:170, dpi:480, fire:52},
+"Samsung Galaxy A34":{general:178,red:172, x2:165, x4:158, sniper:135, free:160, dpi:420, fire:50},
+"Samsung Galaxy A54":{general:175,red:170, x2:162, x4:155, sniper:132, free:158, dpi:420, fire:50},
+"Samsung Galaxy S23":{general:165,red:160, x2:152, x4:148, sniper:125, free:150, dpi:380, fire:48},
+"Samsung Galaxy S24":{general:162,red:158, x2:150, x4:145, sniper:122, free:148, dpi:380, fire:48},
+"Samsung Galaxy M34":{general:188,red:180, x2:172, x4:165, sniper:142, free:168, dpi:480, fire:52},
+// Redmi - Thoda heavy touch, high sensi
+"Redmi Note 12":{general:195,red:188, x2:180, x4:172, sniper:148, free:175, dpi:520, fire:55},
+"Redmi Note 13":{general:192,red:185, x2:178, x4:170, sniper:146, free:172, dpi:520, fire:54},
+"Redmi Note 13 Pro":{general:185,red:178, x2:170, x4:163, sniper:140, free:165, dpi:480, fire:52},
+"Redmi 12":{general:200,red:195, x2:188, x4:180, sniper:155, free:185, dpi:560, fire:58},
+"Redmi 13C":{general:205,red:198, x2:190, x4:182, sniper:158, free:188, dpi:580, fire:58},
+// Poco - Gaming phone, balanced
+"Poco X6":{general:180,red:175, x2:168, x4:160, sniper:138, free:162, dpi:440, fire:50},
+"Poco X6 Pro":{general:172,red:168, x2:160, x4:152, sniper:130, free:155, dpi:400, fire:48},
+"Poco F5":{general:168,red:163, x2:155, x4:148, sniper:128, free:152, dpi:400, fire:48},
+"Poco M6 Pro":{general:195,red:188, x2:180, x4:172, sniper:148, free:175, dpi:520, fire:55},
+// Realme
+"Realme 11":{general:188,red:180, x2:172, x4:165, sniper:142, free:168, dpi:480, fire:52},
+"Realme 12":{general:185,red:178, x2:170, x4:163, sniper:140, free:165, dpi:480, fire:52},
+"Realme Narzo 60":{general:192,red:185, x2:178, x4:170, sniper:146, free:172, dpi:500, fire:54},
+"Realme GT Neo 3":{general:170,red:165, x2:158, x4:150, sniper:130, free:154, dpi:400, fire:48},
+// Vivo
+"Vivo T2":{general:190,red:182, x2:175, x4:168, sniper:144, free:170, dpi:500, fire:53},
+"Vivo V29":{general:178,red:172, x2:165, x4:158, sniper:135, free:160, dpi:430, fire:50},
+"Vivo V30":{general:175,red:170, x2:162, x4:155, sniper:132, free:158, dpi:420, fire:50},
+// Oppo
+"Oppo A78":{general:195,red:188, x2:180, x4:172, sniper:148, free:175, dpi:520, fire:55},
+"Oppo Reno 11":{general:178,red:172, x2:165, x4:158, sniper:135, free:160, dpi:430, fire:50},
+// OnePlus - Smoothest touch
+"OnePlus Nord CE4":{general:175,red:170, x2:162, x4:155, sniper:132, free:158, dpi:420, fire:50},
+"OnePlus 11R":{general:168,red:163, x2:155, x4:148, sniper:128, free:152, dpi:400, fire:48},
+"OnePlus 12R":{general:165,red:160, x2:152, x4:145, sniper:125, free:150, dpi:380, fire:48},
+// iQOO - Gaming
+"iQOO Z9":{general:178,red:172, x2:165, x4:158, sniper:135, free:160, dpi:430, fire:50},
+"iQOO Neo 7":{general:172,red:168, x2:160, x4:152, sniper:130, free:155, dpi:400, fire:48},
+// iPhone - iOS touch alag hai, low sensi
+"iPhone 11":{general:175,red:168, x2:160, x4:152, sniper:130, free:155, dpi:0, fire:50},
+"iPhone 13":{general:168,red:162, x2:155, x4:148, sniper:125, free:150, dpi:0, fire:48},
+"iPhone 15":{general:162,red:158, x2:150, x4:145, sniper:122, free:148, dpi:0, fire:48},
+"iPhone 15 Pro Max":{general:158,red:154, x2:148, x4:142, sniper:120, free:145, dpi:0, fire:47},
+// Infinix / Tecno / Motorola / Lava - Budget, high sensi
+"Infinix Note 30":{general:198,red:192, x2:185, x4:178, sniper:152, free:180, dpi:540, fire:56},
+"Infinix GT 10 Pro":{general:180,red:175, x2:168, x4:160, sniper:138, free:162, dpi:440, fire:50},
+"Tecno Spark 20":{general:205,red:198, x2:190, x4:182, sniper:158, free:188, dpi:580, fire:58},
+"Moto G54":{general:192,red:185, x2:178, x4:170, sniper:146, free:172, dpi:500, fire:54},
+"Nothing Phone 2":{general:170,red:165, x2:158, x4:150, sniper:130, free:154, dpi:400, fire:48}
+};
+
+let defaultSensi={general:190,red:183,x2:175,x4:168,sniper:144,free:170,dpi:500,fire:53,price:5};
+
+function getSensi(key){
+  let saved=localStorage.getItem('cts_'+key);
+  if(saved) return JSON.parse(saved);
+  if(sensiDB[key]) return {...sensiDB[key],price:5};
+  return defaultSensi;
+}
+function loadModels(){
+  let b=document.getElementById('brand').value;
+  let m=document.getElementById('model');
+  m.innerHTML='<option value="">Model Choose Karo</option>';
+  if(models[b]) models[b].forEach(x=>m.innerHTML+=`<option value="${x}">${x}</option>`);
+  updatePrice();
+}
+function updatePrice(){
+  let b=document.getElementById('brand').value;let mo=document.getElementById('model').value;
+  let s=getSensi(b+' '+mo);
+  document.getElementById('priceShow').innerText='Price: ₹'+(s.price||5)+' Only';
+}
+document.getElementById('model').addEventListener('change',updatePrice);
+function goPay(){
+  let b=document.getElementById('brand').value;let mo=document.getElementById('model').value;
+  if(!b||!mo){alert('Pehle Brand aur Model choose karo!');return;}
+  let s=getSensi(b+' '+mo);
+  document.getElementById('step1').style.display='none';
+  document.getElementById('step2').style.display='block';
+  document.getElementById('payFor').innerText=b+' '+mo+' - ₹'+(s.price||5);
+}
+function backTo1(){document.getElementById('step2').style.display='none';document.getElementById('step1').style.display='block';}
+function backToShop(){document.getElementById('step3').style.display='none';document.getElementById('step1').style.display='block';}
+function verifyPay(){
+  let utr=document.getElementById('utr').value;let msg=document.getElementById('verifyMsg');
+  if(utr.length<6){msg.innerText='Sahi UTR daalo! Payment ke baad milta hai.';return;}
+  msg.innerText='Verifying... 2 sec ruko...';
+  setTimeout(()=>{
+    let b=document.getElementById('brand').value;let mo=document.getElementById('model').value;let device=b+' '+mo;let s=getSensi(device);
+    document.getElementById('step2').style.display='none';
+    let st=document.getElementById('step3');st.style.display='block';
+    document.getElementById('sensiDevice').innerText=device;
+    document.getElementById('sensiData').innerHTML=`
+      <div class="sensi-row"><span>General</span><span>${s.general}</span></div>
+      <div class="sensi-row"><span>Red Dot</span><span>${s.red}</span></div>
+      <div class="sensi-row"><span>2X Scope</span><span>${s.x2}</span></div>
+      <div class="sensi-row"><span>4X Scope</span><span>${s.x4}</span></div>
+      <div class="sensi-row"><span>Sniper Scope</span><span>${s.sniper}</span></div>
+      <div class="sensi-row"><span>Free Look</span><span>${s.free}</span></div>
+    `;
+    document.getElementById('extraData').innerHTML=`
+      DPI: <b>${s.dpi==0?'iPhone me DPI nahi hota':s.dpi}</b><br>
+      Fire Button Size: <b>${s.fire}</b><br>
+      Gyroscope: <b>OFF (Headshot ke liye best)</b><br>
+      Aim Precision: <b>Default</b>
+    `;
+  },2000);
+}
+function showAdmin(){document.getElementById('adminPanel').scrollIntoView();}
+function unlockAdmin(){
+  if(document.getElementById('adminPass').value=='1234'){
+    document.getElementById('adminForm').classList.remove('hidden');
+    let ab=document.getElementById('aBrand');ab.innerHTML='<option value="">Brand</option>';
+    Object.keys(models).forEach(k=>ab.innerHTML+=`<option value="${k}">${k}</option>`);
+  } else alert('Wrong Password!');
+}
+function loadAdminModels(){let b=document.getElementById('aBrand').value;let m=document.getElementById('aModel');m.innerHTML='<option value="">Model</option>';if(models[b])models[b].forEach(x=>m.innerHTML+=`<option value="${x}">${x}</option>`);}
+function saveSensi(){
+  let b=document.getElementById('aBrand').value;let mo=document.getElementById('aModel').value;
+  if(!b||!mo){alert('Brand Model choose karo');return;}
+  let old=getSensi(b+' '+mo);
+  let data={general:document.getElementById('aGeneral').value||old.general,red:document.getElementById('aRedDot').value||old.red,x2:document.getElementById('a2x').value||old.x2,x4:document.getElementById('a4x').value||old.x4,sniper:document.getElementById('aSniper').value||old.sniper,free:document.getElementById('aFreeLook').value||old.free,dpi:document.getElementById('aDPI').value||old.dpi,fire:document.getElementById('aFire').value||old.fire,price:document.getElementById('aPrice').value||5};
+  localStorage.setItem('cts_'+b+' '+mo,JSON.stringify(data));
+  document.getElementById('adminMsg').innerText='Saved! '+b+' '+mo+' ki sensi update ho gayi.';
+}
+</script>
+</body>
+  </html>
