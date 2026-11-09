@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTS MOD - Final</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#000;color:#fff;padding:15px}
+.top{background:#1a1a1a;padding:15px;font-size:22px;font-weight:bold;border-left:5px solid #ff0000;display:flex;justify-content:space-between;align-items:center}
+.top span:last-child{font-size:13px;color:#ff0000;cursor:pointer}
+.warn{background:#ff0000;padding:10px;text-align:center;font-size:12px;font-weight:bold;margin:15px 0;border-radius:8px}
+.box{max-width:450px;margin:auto}
+.card{background:#111;border:1px solid #333;border-radius:12px;padding:15px;margin-bottom:15px}
+h3{color:#ff0000;margin-bottom:10px}
+select,input{width:100%;padding:12px;background:#222;color:#fff;border:1px solid #444;border-radius:8px;margin-bottom:10px;outline:none}
+button{width:100%;padding:13px;background:#ff0000;color:#fff;border:none;border-radius:8px;font-weight:bold;font-size:15px;cursor:pointer}
+button.green{background:#00c853} button.gray{background:#333}
+.price-box{text-align:center;font-size:20px;padding:15px;background:#1a0000;border:1px solid #ff0000;border-radius:10px;margin:10px 0}
+.qr-box{text-align:center;display:none}
+.qr-box img{width:220px;height:220px;background:#fff;padding:10px;border-radius:10px}
+.sensi-box{display:none;background:#0a0a0a;border:1px solid #00c853;padding:15px;border-radius:10px;line-height:2}
+.hidden{display:none}
+.tabs{display:flex;gap:10px;margin-bottom:15px}
+.tabs button{flex:1}
+.profile-pic{width:70px;height:70px;background:#ff0000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;margin:auto;margin-bottom:10px}
+.purchase-item{background:#1a1a1a;border:1px solid #333;padding:10px;border-radius:8px;margin-bottom:8px;font-size:14px;line-height:1.6}
+.purchase-item b{color:#00ff88}
+</style>
+</head>
+<body>
+<div class="box">
+<div class="top"><span>CTS MOD</span><span onclick="document.getElementById('adminPanel').scrollIntoView()">ADMIN</span></div>
+<div class="warn">100% SAFE - ONLY SENSITIVITY - NO HACK<br>DON'T TRY IN MAIN ID</div>
+
+<!-- AUTH -->
+<div class="card" id="authScreen">
+<h3 id="authTitle">CREATE ACCOUNT</h3>
+<input type="text" id="regName" placeholder="Full Name">
+<input type="text" id="regEmail" placeholder="Email (Phone se login ke liye pehle Email banao)">
+<input type="password" id="regPass" placeholder="Password">
+<input type="password" id="regConfirm" placeholder="Confirm Password">
+<button onclick="handleAuth()">SIGN UP</button>
+<p style="text-align:center;margin:12px 0;font-size:13px;color:#aaa">Already Account Hai?</p>
+<button class="gray" onclick="toggleAuth()">LOGIN KARO</button>
+<p id="authMsg" style="margin-top:10px;color:yellow;text-align:center"></p>
+<p style="font-size:11px;color:#777;text-align:center;margin-top:10px">Phone Number se login ke liye Firebase me Phone Auth Enable karna padega.<br>Abhi Email wala system chal raha hai.</p>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" class="hidden">
+<div class="tabs">
+<button onclick="showTab('shop')">🛒 SHOP</button>
+<button onclick="showTab('profile')">👤 PROFILE</button>
+<button onclick="logout()" style="background:#333">LOGOUT</button>
+</div>
+
+<div id="tabShop">
+<div class="card"><p>Welcome, <b id="welcomeName">User</b> 👋</p><p style="font-size:13px;color:#aaa" id="welcomeEmail"></p></div>
+<div class="card" id="step1">
+<h3>1. Device Choose Karo</h3>
+<select id="brand" onchange="loadModels()"><option value="">Brand Choose Karo</option><option value="Samsung">Samsung</option><option value="Redmi">Redmi / Xiaomi</option><option value="Poco">Poco</option><option value="Realme">Realme</option><option value="Vivo">Vivo</option><option value="Oppo">Oppo</option><option value="OnePlus">OnePlus</option><option value="iQOO">iQOO</option><option value="Motorola">Motorola</option><option value="Infinix">Infinix</option><option value="Tecno">Tecno</option><option value="iPhone">iPhone</option><option value="Nothing">Nothing</option></select>
+<select id="model"><option value="">Pehle Brand Choose Karo</option></select>
+<div class="price-box" id="priceShow">Price: ₹5</div>
+<button onclick="goPay()">PAY - SENSITIVITY UNLOCK KARO</button>
+</div>
+<div class="card qr-box" id="step2">
+<h3>2. UPI Se Pay Karo</h3>
+<p id="payFor"></p>
+<img src="my-qr.png" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa=YOURUPI@okaxis&pn=CTS%20MOD&am=5&cu=INR'">
+<p style="margin:10px 0;font-size:14px">UPI ID: <b>YOURUPI@okaxis - YAHAN APNI UPI DALO</b></p>
+<input type="text" id="utr" placeholder="UTR / Transaction ID daalo
