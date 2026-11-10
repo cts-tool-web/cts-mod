@@ -15,7 +15,7 @@ body{background:#000;color:#fff;padding:15px}
 h3{color:#ff0000;margin-bottom:10px}
 select,input{width:100%;padding:13px;background:#222;color:#fff;border:1px solid #444;border-radius:8px;margin-bottom:10px;outline:none;font-size:15px}
 button{width:100%;padding:14px;background:#ff0000;color:#fff;border:none;border-radius:8px;font-weight:bold;font-size:16px;cursor:pointer}
-button.green{background:#00c853} button.gray{background:#333}
+button.green{background:#00c853} button.gray{background:#333} button.small{padding:8px;font-size:13px;margin-top:5px}
 .price-box{text-align:center;font-size:22px;padding:15px;background:#1a0000;border:1px solid #ff0000;border-radius:10px;margin:10px 0}
 .qr-box{text-align:center;display:none}
 .qr-box img{width:230px;height:230px;background:#fff;padding:10px;border-radius:10px}
@@ -24,6 +24,8 @@ button.green{background:#00c853} button.gray{background:#333}
 .sensi-row span:last-child{color:#00ff88;font-weight:bold}
 .hidden{display:none}
 .note{font-size:12px;color:#aaa;line-height:1.6;margin-top:10px}
+.pending-box{background:#2a1a00;border:1px solid #ffaa00;padding:12px;border-radius:8px;margin-top:10px;display:none}
+.code-box{background:#002a12;border:1px solid #00c853;padding:12px;border-radius:8px;margin-top:10px}
 </style>
 </head>
 <body>
@@ -37,17 +39,24 @@ button.green{background:#00c853} button.gray{background:#333}
 <select id="model"><option value="">Pehle Brand Choose Karo</option></select>
 <div class="price-box" id="priceShow">Price: ₹5 Only</div>
 <button onclick="goPay()">PAY ₹5 - SENSITIVITY UNLOCK KARO</button>
-<p class="note">Payment ke baad usi device ki real sensi khulegi.</p>
+<p class="note">Payment ke baad UTR dalo, Admin approve karke CODE dega, CODE dalne par sensi khulegi.</p>
 </div>
 
 <div class="card qr-box" id="step2">
 <h3>2. UPI Se Pay Karo</h3>
 <p id="payFor"></p>
-<img src="my-qr.png" style="width:230px;height:230px;background:#fff;padding:10px;border-radius:10px">
+<img src="my-qr.png" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=vedanttawade6@fam&pn=CTS%20MOD&am=5&cu=INR'">
 <p style="margin:12px 0;font-size:14px">UPI ID: <b>vedanttawade6@fam</b></p>
-<input type="text" id="utr" placeholder="UTR / Transaction ID daalo">
-<button class="green" onclick="verifyPay()">I HAVE PAID - VERIFY KARO</button>
+<input type="text" id="utr" placeholder="UTR / Transaction ID daalo (12 digit)">
+<button class="green" onclick="verifyPay()">I HAVE PAID - REQUEST BHEJO</button>
 <p id="verifyMsg" style="margin-top:10px;color:yellow"></p>
+<div id="pendingArea" class="pending-box">
+<b style="color:#ffaa00">⏳ PENDING HAI</b><br>
+<span style="font-size:13px">Admin ko WhatsApp karo apna UTR bhejo. Approve hone ke baad CODE milega.</span><br><br>
+<input type="text" id="unlockCode" placeholder="Admin se mila 6-digit CODE daalo">
+<button class="green" onclick="unlockWithCode()">CODE SE UNLOCK KARO</button>
+<p id="codeMsg" style="margin-top:8px;color:yellow;font-size:13px"></p>
+</div>
 <button class="gray" style="margin-top:10px" onclick="backTo1()">Back</button>
 </div>
 
@@ -64,6 +73,11 @@ button.green{background:#00c853} button.gray{background:#333}
 <input type="password" id="adminPass" placeholder="Admin Password: 1234">
 <button class="gray" onclick="unlockAdmin()">UNLOCK ADMIN</button>
 <div id="adminForm" class="hidden" style="margin-top:10px">
+<h3 style="font-size:16px">PENDING PAYMENTS - Yahan se Approve karo</h3>
+<div id="pendingList"></div>
+<button class="gray" onclick="showPending()">PENDING REFRESH KARO</button>
+<hr style="border:1px solid #333;margin:15px 0">
+<h3 style="font-size:16px">Sensi Edit Karo</h3>
 <select id="aBrand" onchange="loadAdminModels()"><option value="">Brand</option></select>
 <select id="aModel"><option value="">Model</option></select>
 <input type="text" id="aGeneral" placeholder="General">
@@ -82,25 +96,25 @@ button.green{background:#00c853} button.gray{background:#333}
 </div>
 
 <script>
-// ============ PURA DEVICE LIST - INDIA ============
 let models={
-"Samsung":["Galaxy A03","Galaxy A04","Galaxy A05","Galaxy A05s","Galaxy A14","Galaxy A15","Galaxy A16","Galaxy A22","Galaxy A23","Galaxy A24","Galaxy A32","Galaxy A33","Galaxy A34","Galaxy A35","Galaxy A52","Galaxy A53","Galaxy A54","Galaxy A55","Galaxy M13","Galaxy M14","Galaxy M33","Galaxy M34","Galaxy M54","Galaxy F13","Galaxy F14","Galaxy F15","Galaxy F23","Galaxy F34","Galaxy F54","Galaxy S20 FE","Galaxy S21","Galaxy S21 FE","Galaxy S22","Galaxy S23","Galaxy S23 FE","Galaxy S24","Galaxy S24 FE","Galaxy S24 Ultra","Galaxy Z Flip 4","Galaxy Z Fold 4"],
-"Vivo":["Vivo Y02","Vivo Y16","Vivo Y17s","Vivo Y21","Vivo Y22","Vivo Y27","Vivo Y28","Vivo Y35","Vivo Y36","Vivo Y56","Vivo Y100","Vivo Y200","Vivo T1","Vivo T2","Vivo T2x","Vivo T3","Vivo T3x","Vivo V21","Vivo V23","Vivo V25","Vivo V27","Vivo V29","Vivo V30","Vivo V40","Vivo X80","Vivo X90","Vivo X100"],
-"Oppo":["Oppo A16","Oppo A17","Oppo A18","Oppo A38","Oppo A57","Oppo A59","Oppo A78","Oppo A79","Oppo F19","Oppo F21","Oppo F23","Oppo F25","Oppo Reno 6","Oppo Reno 7","Oppo Reno 8","Oppo Reno 10","Oppo Reno 11","Oppo Reno 12","Oppo K10","Oppo K11x","Oppo Find X5"],
-"Realme":["Realme C11","Realme C21","Realme C25","Realme C30","Realme C33","Realme C35","Realme C51","Realme C53","Realme C55","Realme C61","Realme C65","Realme 8","Realme 9","Realme 10","Realme 10 Pro","Realme 11","Realme 11 Pro","Realme 12","Realme 12 Pro","Realme 13","Realme Narzo 30","Realme Narzo 50","Realme Narzo 60","Realme Narzo 70","Realme GT Neo 2","Realme GT Neo 3","Realme GT 6"],
-"Redmi":["Redmi 9","Redmi 10","Redmi 11 Prime","Redmi 12","Redmi 12C","Redmi 13C","Redmi 13","Redmi Note 9","Redmi Note 10","Redmi Note 11","Redmi Note 11 Pro","Redmi Note 12","Redmi Note 12 Pro","Redmi Note 13","Redmi Note 13 Pro","Redmi Note 13 Pro Max","Redmi Note 13 Pro Plus","Redmi K20","Redmi K50i","Redmi A1","Redmi A2","Redmi A3"],
-"Poco":["Poco C51","Poco C55","Poco C61","Poco C65","Poco M2","Poco M3","Poco M4","Poco M5","Poco M6","Poco M6 Pro","Poco X3","Poco X4","Poco X5","Poco X5 Pro","Poco X6","Poco X6 Pro","Poco F1","Poco F3","Poco F4","Poco F5","Poco F6"],
-"OnePlus":["OnePlus 7","OnePlus 8","OnePlus 9","OnePlus 9R","OnePlus 10R","OnePlus 11","OnePlus 11R","OnePlus 12","OnePlus 12R","OnePlus Nord","OnePlus Nord 2","OnePlus Nord 3","OnePlus Nord CE","OnePlus Nord CE2","OnePlus Nord CE3","OnePlus Nord CE4","OnePlus Nord N20"],
-"iQOO":["iQOO 7","iQOO 9","iQOO 11","iQOO 12","iQOO Z5","iQOO Z6","iQOO Z7","iQOO Z7s","iQOO Z9","iQOO Z9x","iQOO Neo 6","iQOO Neo 7","iQOO Neo 9"],
-"Motorola":["Moto E13","Moto E32","Moto G13","Moto G14","Moto G22","Moto G32","Moto G42","Moto G52","Moto G54","Moto G62","Moto G72","Moto G73","Moto G84","Moto Edge 20","Moto Edge 30","Moto Edge 40","Moto Edge 50","Moto G34","Moto G64"],
-"Infinix":["Infinix Hot 10","Infinix Hot 11","Infinix Hot 12","Infinix Hot 30","Infinix Hot 40","Infinix Note 10","Infinix Note 12","Infinix Note 30","Infinix Note 40","Infinix Smart 7","Infinix Smart 8","Infinix Zero 5G","Infinix Zero 20","Infinix Zero 30","Infinix GT 10 Pro","Infinix GT 20 Pro"],
-"Tecno":["Tecno Spark 8","Tecno Spark 9","Tecno Spark 10","Tecno Spark 20","Tecno Spark Go","Tecno Camon 18","Tecno Camon 19","Tecno Camon 20","Tecno Pova 3","Tecno Pova 5","Tecno Pova 6","Tecno Phantom X2"],
-"iPhone":["iPhone 7","iPhone 8","iPhone X","iPhone 11","iPhone 11 Pro","iPhone 12","iPhone 12 Pro","iPhone 13","iPhone 13 Pro","iPhone 14","iPhone 14 Pro","iPhone 15","iPhone 15 Pro","iPhone 15 Pro Max","iPhone 16","iPhone 16 Pro Max"],
-"Nothing":["Nothing Phone 1","Nothing Phone 2","Nothing Phone 2a","Nothing Phone 2a Plus","Nothing CMF Phone 1"],
-"Lava":["Lava Blaze","Lava Blaze 5G","Lava Blaze 2","Lava Agni 2","Lava Yuva 2","Lava Yuva 3","Lava Storm 5G"]
+"Samsung":["Galaxy A03","Galaxy A04","Galaxy A05","Galaxy A05s","Galaxy A14","Galaxy A15","Galaxy A16","Galaxy A22","Galaxy A23","Galaxy A24","Galaxy A32","Galaxy A33","Galaxy A34","Galaxy A35","Galaxy A36","Galaxy A52","Galaxy A53","Galaxy A54","Galaxy A55","Galaxy A56","Galaxy M13","Galaxy M14","Galaxy M15","Galaxy M33","Galaxy M34","Galaxy M35","Galaxy M54","Galaxy F13","Galaxy F14","Galaxy F15","Galaxy F23","Galaxy F34","Galaxy F54","Galaxy F55","Galaxy S20 FE","Galaxy S21","Galaxy S21 FE","Galaxy S22","Galaxy S23","Galaxy S23 FE","Galaxy S24","Galaxy S24 FE","Galaxy S24 Ultra","Galaxy S25","Galaxy S25 Ultra","Galaxy Z Flip 4","Galaxy Z Fold 4","Galaxy Z Flip 6"],
+"Vivo":["Vivo Y02","Vivo Y16","Vivo Y17s","Vivo Y21","Vivo Y22","Vivo Y27","Vivo Y28","Vivo Y35","Vivo Y36","Vivo Y56","Vivo Y58","Vivo Y100","Vivo Y200","Vivo T1","Vivo T2","Vivo T2x","Vivo T3","Vivo T3x","Vivo T4","Vivo V21","Vivo V23","Vivo V25","Vivo V27","Vivo V29","Vivo V30","Vivo V40","Vivo V50","Vivo X80","Vivo X90","Vivo X100","Vivo X200"],
+"Oppo":["Oppo A16","Oppo A17","Oppo A18","Oppo A38","Oppo A57","Oppo A59","Oppo A78","Oppo A79","Oppo A3","Oppo A5 Pro","Oppo F19","Oppo F21","Oppo F23","Oppo F25","Oppo F27","Oppo Reno 6","Oppo Reno 7","Oppo Reno 8","Oppo Reno 10","Oppo Reno 11","Oppo Reno 12","Oppo Reno 13","Oppo K10","Oppo K11x","Oppo K12x","Oppo Find X5","Oppo Find X8"],
+"Realme":["Realme C11","Realme C21","Realme C25","Realme C30","Realme C33","Realme C35","Realme C51","Realme C53","Realme C55","Realme C61","Realme C63","Realme C65","Realme 8","Realme 9","Realme 10","Realme 10 Pro","Realme 11","Realme 11 Pro","Realme 12","Realme 12 Pro","Realme 13","Realme 13 Pro","Realme 14","Realme 14 Pro","Realme Narzo 30","Realme Narzo 50","Realme Narzo 60","Realme Narzo 70","Realme Narzo 80","Realme GT Neo 2","Realme GT Neo 3","Realme GT 6","Realme GT 7","Realme P1","Realme P3"],
+"Redmi":["Redmi 9","Redmi 10","Redmi 11 Prime","Redmi 12","Redmi 12C","Redmi 13C","Redmi 13","Redmi 14C","Redmi Note 9","Redmi Note 10","Redmi Note 11","Redmi Note 11 Pro","Redmi Note 12","Redmi Note 12 Pro","Redmi Note 13","Redmi Note 13 Pro","Redmi Note 13 Pro Max","Redmi Note 13 Pro Plus","Redmi Note 14","Redmi Note 14 Pro","Redmi Note 14 Pro Plus","Redmi K20","Redmi K50i","Redmi A1","Redmi A2","Redmi A3","Redmi A4"],
+"Poco":["Poco C51","Poco C55","Poco C61","Poco C65","Poco C75","Poco M2","Poco M3","Poco M4","Poco M5","Poco M6","Poco M6 Pro","Poco M7","Poco X3","Poco X4","Poco X5","Poco X5 Pro","Poco X6","Poco X6 Pro","Poco X7","Poco X7 Pro","Poco F1","Poco F3","Poco F4","Poco F5","Poco F6","Poco F7"],
+"OnePlus":["OnePlus 7","OnePlus 8","OnePlus 9","OnePlus 9R","OnePlus 10R","OnePlus 11","OnePlus 11R","OnePlus 12","OnePlus 12R","OnePlus 13","OnePlus 13R","OnePlus Nord","OnePlus Nord 2","OnePlus Nord 3","OnePlus Nord 4","OnePlus Nord CE","OnePlus Nord CE2","OnePlus Nord CE3","OnePlus Nord CE4","OnePlus Nord CE5","OnePlus Nord N20"],
+"iQOO":["iQOO 7","iQOO 9","iQOO 11","iQOO 12","iQOO 13","iQOO Z5","iQOO Z6","iQOO Z7","iQOO Z7s","iQOO Z9","iQOO Z9x","iQOO Z10","iQOO Neo 6","iQOO Neo 7","iQOO Neo 9","iQOO Neo 10"],
+"Motorola":["Moto E13","Moto E32","Moto G13","Moto G14","Moto G22","Moto G32","Moto G42","Moto G52","Moto G54","Moto G62","Moto G72","Moto G73","Moto G84","Moto Edge 20","Moto Edge 30","Moto Edge 40","Moto Edge 50","Moto Edge 60","Moto G34","Moto G64","Moto G85","Moto G96"],
+"Infinix":["Infinix Hot 10","Infinix Hot 11","Infinix Hot 12","Infinix Hot 30","Infinix Hot 40","Infinix Hot 50","Infinix Note 10","Infinix Note 12","Infinix Note 30","Infinix Note 40","Infinix Note 50","Infinix Smart 7","Infinix Smart 8","Infinix Smart 9","Infinix Zero 5G","Infinix Zero 20","Infinix Zero 30","Infinix Zero 40","Infinix GT 10 Pro","Infinix GT 20 Pro","Infinix GT 30 Pro"],
+"Tecno":["Tecno Spark 8","Tecno Spark 9","Tecno Spark 10","Tecno Spark 20","Tecno Spark 30","Tecno Spark Go","Tecno Camon 18","Tecno Camon 19","Tecno Camon 20","Tecno Camon 30","Tecno Pova 3","Tecno Pova 5","Tecno Pova 6","Tecno Pova 7","Tecno Phantom X2"],
+"iPhone":["iPhone 7","iPhone 8","iPhone X","iPhone 11","iPhone 11 Pro","iPhone 12","iPhone 12 Pro","iPhone 13","iPhone 13 Pro","iPhone 14","iPhone 14 Pro","iPhone 15","iPhone 15 Pro","iPhone 15 Pro Max","iPhone 16","iPhone 16 Pro","iPhone 16 Pro Max","iPhone 17","iPhone 17 Pro Max","iPhone Air"],
+"Nothing":["Nothing Phone 1","Nothing Phone 2","Nothing Phone 2a","Nothing Phone 2a Plus","Nothing Phone 3","Nothing Phone 3a","Nothing CMF Phone 1","Nothing CMF Phone 2"],
+"Lava":["Lava Blaze","Lava Blaze 5G","Lava Blaze 2","Lava Blaze 3","Lava Agni 2","Lava Agni 3","Lava Yuva 2","Lava Yuva 3","Lava Yuva 5","Lava Storm 5G"],
+"Honor":["Honor 90","Honor 200","Honor X9b","Honor X9c","Honor Magic 6 Lite","Honor 200 Lite"],
+"Asus ROG":["ROG Phone 6","ROG Phone 7","ROG Phone 8","ROG Phone 9"],
+"Nokia":["Nokia G42","Nokia G60","Nokia X30","Nokia C32"]
 };
-
-// Brand wise base sensi - agar koi model sensiDB me nahi hai to ye use hoga, to koi device khaali nahi rahega
 let brandBase={
 "Samsung":{general:182,red:176,x2:168,x4:160,sniper:138,free:162,dpi:440,fire:51},
 "Vivo":{general:185,red:178,x2:170,x4:162,sniper:140,free:165,dpi:470,fire:52},
@@ -115,27 +129,35 @@ let brandBase={
 "Tecno":{general:202,red:195,x2:188,x4:180,sniper:155,free:185,dpi:560,fire:57},
 "iPhone":{general:168,red:162,x2:155,x4:148,sniper:128,free:150,dpi:0,fire:48},
 "Nothing":{general:172,red:167,x2:159,x4:152,sniper:131,free:155,dpi:400,fire:48},
-"Lava":{general:198,red:191,x2:183,x4:175,sniper:151,free:178,dpi:540,fire:56}
+"Lava":{general:198,red:191,x2:183,x4:175,sniper:151,free:178,dpi:540,fire:56},
+"Honor":{general:180,red:174,x2:166,x4:158,sniper:136,free:160,dpi:440,fire:50},
+"Asus ROG":{general:160,red:155,x2:148,x4:142,sniper:122,free:148,dpi:360,fire:47},
+"Nokia":{general:195,red:188,x2:180,x4:172,sniper:148,free:175,dpi:520,fire:54}
 };
-
-// Specific flagship / gaming ke liye thodi alag sensi
 let sensiDB={
 "Samsung Galaxy S24 Ultra":{general:160,red:155,x2:148,x4:142,sniper:120,free:145,dpi:360,fire:47},
-"Samsung Galaxy S23":{general:165,red:160,x2:152,x4:148,sniper:125,free:150,dpi:380,fire:48},
+"Samsung Galaxy S25 Ultra":{general:158,red:153,x2:146,x4:140,sniper:118,free:143,dpi:350,fire:47},
 "Samsung Galaxy A14":{general:192,red:185,x2:178,x4:170,sniper:146,free:172,dpi:500,fire:54},
 "Vivo V30":{general:175,red:170,x2:162,x4:155,sniper:132,free:158,dpi:420,fire:50},
+"Vivo V50":{general:172,red:168,x2:160,x4:152,sniper:130,free:155,dpi:410,fire:49},
 "Vivo Y27":{general:198,red:191,x2:183,x4:175,sniper:151,free:178,dpi:540,fire:56},
 "Vivo T3":{general:178,red:172,x2:165,x4:158,sniper:135,free:160,dpi:430,fire:50},
 "Redmi Note 13 Pro Plus":{general:178,red:172,x2:165,x4:158,sniper:135,free:160,dpi:430,fire:50},
 "Redmi 13C":{general:205,red:198,x2:190,x4:182,sniper:158,free:188,dpi:580,fire:58},
+"Redmi Note 14 Pro Plus":{general:176,red:170,x2:163,x4:156,sniper:133,free:158,dpi:420,fire:50},
 "Poco F6":{general:165,red:160,x2:152,x4:145,sniper:125,free:150,dpi:380,fire:48},
 "Poco X6 Pro":{general:172,red:168,x2:160,x4:152,sniper:130,free:155,dpi:400,fire:48},
+"Poco X7 Pro":{general:168,red:163,x2:156,x4:149,sniper:127,free:152,dpi:390,fire:48},
 "OnePlus 12":{general:162,red:158,x2:150,x4:145,sniper:122,free:148,dpi:380,fire:48},
+"OnePlus 13":{general:160,red:156,x2:149,x4:143,sniper:120,free:146,dpi:370,fire:47},
 "iQOO 12":{general:165,red:160,x2:152,x4:145,sniper:125,free:150,dpi:380,fire:48},
+"iQOO 13":{general:163,red:158,x2:151,x4:144,sniper:123,free:149,dpi:375,fire:48},
 "iPhone 15 Pro Max":{general:158,red:154,x2:148,x4:142,sniper:120,free:145,dpi:0,fire:47},
-"Infinix GT 20 Pro":{general:172,red:168,x2:160,x4:152,sniper:130,free:155,dpi:400,fire:48}
+"iPhone 17 Pro Max":{general:156,red:152,x2:146,x4:140,sniper:118,free:143,dpi:0,fire:47},
+"Infinix GT 20 Pro":{general:172,red:168,x2:160,x4:152,sniper:130,free:155,dpi:400,fire:48},
+"Infinix GT 30 Pro":{general:170,red:166,x2:158,x4:150,sniper:128,free:153,dpi:395,fire:48},
+"Asus ROG ROG Phone 9":{general:155,red:151,x2:144,x4:138,sniper:115,free:142,dpi:340,fire:46}
 };
-
 function getSensi(key,brand){
   let saved=localStorage.getItem('cts_'+key);
   if(saved) return JSON.parse(saved);
@@ -143,12 +165,9 @@ function getSensi(key,brand){
   if(brandBase[brand]) return {...brandBase[brand],price:5};
   return {general:190,red:183,x2:175,x4:168,sniper:144,free:170,dpi:500,fire:53,price:5};
 }
-
-// Brand dropdown bharo
 let brandSel=document.getElementById('brand');
 Object.keys(models).forEach(b=>brandSel.innerHTML+=`<option value="${b}">${b}</option>`);
 let aBrandSel=document.getElementById('aBrand');
-
 function loadModels(){
   let b=document.getElementById('brand').value;
   let m=document.getElementById('model');
@@ -172,12 +191,29 @@ function goPay(){
 }
 function backTo1(){document.getElementById('step2').style.display='none';document.getElementById('step1').style.display='block';}
 function backToShop(){document.getElementById('step3').style.display='none';document.getElementById('step1').style.display='block';}
+
+// === NAYA CHUNA-PROOF SYSTEM ===
 function verifyPay(){
-  let utr=document.getElementById('utr').value;let msg=document.getElementById('verifyMsg');
-  if(utr.length<6){msg.innerText='Sahi UTR daalo!';return;}
-  msg.innerText='Verifying... 2 sec ruko...';
-  setTimeout(()=>{
-    let b=document.getElementById('brand').value;let mo=document.getElementById('model').value;let device=b+' '+mo;let s=getSensi(device,b);
+  let utr=document.getElementById('utr').value.trim();
+  let msg=document.getElementById('verifyMsg');
+  if(utr.length<6){msg.innerText='Sahi UTR daalo! 12 digit ka hota hai.';return;}
+  let b=document.getElementById('brand').value;let mo=document.getElementById('model').value;
+  let pending=JSON.parse(localStorage.getItem('cts_pending')||'[]');
+  // Same UTR dubara to nahi?
+  if(pending.find(p=>p.utr==utr)){msg.innerText='Ye UTR pehle se pending hai!';return;}
+  pending.push({device:b+' '+mo,utr:utr,time:new Date().toLocaleString()});
+  localStorage.setItem('cts_pending',JSON.stringify(pending));
+  msg.innerText='Request bhej di! Sensi abhi nahi khulegi.';
+  msg.style.color='#ffaa00';
+  document.getElementById('pendingArea').style.display='block';
+}
+function unlockWithCode(){
+  let code=document.getElementById('unlockCode').value.trim();
+  let msg=document.getElementById('codeMsg');
+  let b=document.getElementById('brand').value;let mo=document.getElementById('model').value;let device=b+' '+mo;
+  let codes=JSON.parse(localStorage.getItem('cts_codes')||'{}');
+  if(codes[code] && codes[code]==device){
+    let s=getSensi(device,b);
     document.getElementById('step2').style.display='none';
     document.getElementById('step3').style.display='block';
     document.getElementById('sensiDevice').innerText=device;
@@ -189,7 +225,8 @@ function verifyPay(){
       <div class="sensi-row"><span>Sniper Scope</span><span>${s.sniper}</span></div>
       <div class="sensi-row"><span>Free Look</span><span>${s.free}</span></div>`;
     document.getElementById('extraData').innerHTML=`DPI: <b>${s.dpi==0?'iPhone me DPI nahi hota':s.dpi}</b><br>Fire Button Size: <b>${s.fire}</b><br>Gyroscope: <b>OFF</b><br>Aim Precision: <b>Default</b>`;
-  },2000);
+    delete codes[code]; localStorage.setItem('cts_codes',JSON.stringify(codes));
+  } else { msg.innerText='Galat CODE! Admin se sahi CODE lo.'; }
 }
 function showAdmin(){document.getElementById('adminPanel').scrollIntoView();}
 function unlockAdmin(){
@@ -197,7 +234,35 @@ function unlockAdmin(){
     document.getElementById('adminForm').classList.remove('hidden');
     aBrandSel.innerHTML='<option value="">Brand</option>';
     Object.keys(models).forEach(k=>aBrandSel.innerHTML+=`<option value="${k}">${k}</option>`);
+    showPending();
   } else alert('Wrong Password!');
+}
+function showPending(){
+  let pending=JSON.parse(localStorage.getItem('cts_pending')||'[]');
+  let box=document.getElementById('pendingList');
+  if(pending.length==0){box.innerHTML='<p style="color:#aaa">Koi pending nahi hai</p>';return;}
+  box.innerHTML=pending.map((p,i)=>`
+    <div style="background:#222;padding:10px;margin:8px 0;border-radius:8px">
+    <b>${p.device}</b><br>UTR: <b style="color:#ffaa00">${p.utr}</b><br><span style="font-size:12px;color:#aaa">${p.time}</span><br>
+    <button class="green small" onclick="approvePay(${i})">✅ APPROVE - CODE BANAO</button>
+    <button class="gray small" onclick="rejectPay(${i})">❌ REJECT</button>
+    </div>`).join('');
+}
+function approvePay(i){
+  let pending=JSON.parse(localStorage.getItem('cts_pending')||'[]');
+  let item=pending[i];
+  let code=Math.floor(100000+Math.random()*900000).toString();
+  let codes=JSON.parse(localStorage.getItem('cts_codes')||'{}');
+  codes[code]=item.device;
+  localStorage.setItem('cts_codes',JSON.stringify(codes));
+  pending.splice(i,1); localStorage.setItem('cts_pending',JSON.stringify(pending));
+  alert('APPROVED!\nDevice: '+item.device+'\nUTR: '+item.utr+'\n\nCODE: '+code+'\n\nYe CODE user ko WhatsApp par bhej de. User CODE dalega tabhi sensi khulegi.');
+  showPending();
+}
+function rejectPay(i){
+  let pending=JSON.parse(localStorage.getItem('cts_pending')||'[]');
+  pending.splice(i,1); localStorage.setItem('cts_pending',JSON.stringify(pending));
+  showPending();
 }
 function loadAdminModels(){let b=document.getElementById('aBrand').value;let m=document.getElementById('aModel');m.innerHTML='<option value="">Model</option>';if(models[b])models[b].forEach(x=>m.innerHTML+=`<option value="${x}">${x}</option>`);}
 function saveSensi(){
