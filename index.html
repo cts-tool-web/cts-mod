@@ -70,7 +70,7 @@ button.green{background:#00c853} button.gray{background:#333} button.small{paddi
 
 <div class="card" id="adminPanel" style="border:1px dashed #666">
 <h3>ADMIN PANEL</h3>
-<input type="password" id="adminPass" placeholder="Admin Password: 1234">
+<input type="password" id="adminPass" placeholder="Enter Admin Password">
 <button class="gray" onclick="unlockAdmin()">UNLOCK ADMIN</button>
 <div id="adminForm" class="hidden" style="margin-top:10px">
 <h3 style="font-size:16px">PENDING PAYMENTS - Yahan se Approve karo</h3>
@@ -230,7 +230,7 @@ function unlockWithCode(){
 }
 function showAdmin(){document.getElementById('adminPanel').scrollIntoView();}
 function unlockAdmin(){
-  if(document.getElementById('adminPass').value=='1234'){
+  if(document.getElementById('adminPass').value=='CTSMOD@416'){
     document.getElementById('adminForm').classList.remove('hidden');
     aBrandSel.innerHTML='<option value="">Brand</option>';
     Object.keys(models).forEach(k=>aBrandSel.innerHTML+=`<option value="${k}">${k}</option>`);
