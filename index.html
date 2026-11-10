@@ -26,6 +26,7 @@ button.green{background:#00c853} button.gray{background:#333} button.small{paddi
 .note{font-size:12px;color:#aaa;line-height:1.6;margin-top:10px}
 .pending-box{background:#2a1a00;border:1px solid #ffaa00;padding:12px;border-radius:8px;margin-top:10px;display:none}
 .code-box{background:#002a12;border:1px solid #00c853;padding:12px;border-radius:8px;margin-top:10px}
+.wa-btn{display:block;background:#25D366;color:white;text-align:center;padding:14px;border-radius:10px;font-weight:bold;text-decoration:none;margin:10px 0;font-size:16px}
 </style>
 </head>
 <body>
@@ -52,7 +53,8 @@ button.green{background:#00c853} button.gray{background:#333} button.small{paddi
 <p id="verifyMsg" style="margin-top:10px;color:yellow"></p>
 <div id="pendingArea" class="pending-box">
 <b style="color:#ffaa00">⏳ PENDING HAI</b><br>
-<span style="font-size:13px">Admin ko WhatsApp karo apna UTR bhejo. Approve hone ke baad CODE milega.</span><br><br>
+<span style="font-size:13px">Admin ko WhatsApp karo apna UTR bhejo. Approve hone ke baad CODE milega.</span><br>
+<a id="waBtn" href="https://wa.me/918976034412?text=Hi%20Bhai%2C%20Mujhe%20Sensi%20Code%20Chahiye.%20Maine%20Payment%20Kar%20Diya%20Hai." target="_blank" class="wa-btn">📲 Get Code on WhatsApp</a>
 <input type="text" id="unlockCode" placeholder="Admin se mila 6-digit CODE daalo">
 <button class="green" onclick="unlockWithCode()">CODE SE UNLOCK KARO</button>
 <p id="codeMsg" style="margin-top:8px;color:yellow;font-size:13px"></p>
@@ -199,13 +201,15 @@ function verifyPay(){
   if(utr.length<6){msg.innerText='Sahi UTR daalo! 12 digit ka hota hai.';return;}
   let b=document.getElementById('brand').value;let mo=document.getElementById('model').value;
   let pending=JSON.parse(localStorage.getItem('cts_pending')||'[]');
-  // Same UTR dubara to nahi?
   if(pending.find(p=>p.utr==utr)){msg.innerText='Ye UTR pehle se pending hai!';return;}
   pending.push({device:b+' '+mo,utr:utr,time:new Date().toLocaleString()});
   localStorage.setItem('cts_pending',JSON.stringify(pending));
   msg.innerText='Request bhej di! Sensi abhi nahi khulegi.';
   msg.style.color='#ffaa00';
   document.getElementById('pendingArea').style.display='block';
+  // WhatsApp button me UTR + Device auto daal do
+  let waText = "Hi Bhai, Mujhe Sensi Code Chahiye. Maine Payment Kar Diya Hai. Device: " + b + " " + mo + " UTR: " + utr;
+  document.getElementById('waBtn').href = "https://wa.me/918976034412?text=" + encodeURIComponent(waText);
 }
 function unlockWithCode(){
   let code=document.getElementById('unlockCode').value.trim();
